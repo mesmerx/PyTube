@@ -110,26 +110,10 @@ else:
 _internal_guard = object() 
  
 def find_lib(): 
-    dll = None 
-    plugin_path = os.environ.get('PYTHON_VLC_MODULE_PATH', None) 
-    if 'PYTHON_VLC_LIB_PATH' in os.environ: 
-        try: 
-            dll = ctypes.CDLL(os.environ['PYTHON_VLC_LIB_PATH']) 
-        except OSError: 
-            logger.error("Cannot load lib specified by PYTHON_VLC_LIB_PATH env. variable") 
-            sys.exit(1) 
-    if plugin_path and not os.path.isdir(plugin_path): 
-        logger.error("Invalid PYTHON_VLC_MODULE_PATH specified. Please fix.") 
-        sys.exit(1) 
-    if dll is not None: 
-        return dll, plugin_path 
- 
     if sys.platform.startswith('linux'): 
-        p = find_library('vlc') 
-        try: 
-            dll = ctypes.CDLL(p) 
-        except OSError:  # may fail 
-            dll = ctypes.CDLL('libvlc.so.5') 
+        plugin_path='plugins/'
+        dll = ctypes.CDLL('dlls/libvlccore.so.8') 
+        dll = ctypes.CDLL('dlls/libvlc.so.5') 
     elif sys.platform.startswith('win'): 
         libname = 'libvlc.dll' 
         p = find_library(libname) 
@@ -190,7 +174,8 @@ def find_lib():
             dll = ctypes.CDLL('libvlc.dylib') 
  
     else: 
-        raise NotImplementedError('%s: %s not supported' % (sys.argv[0], sys.platform)) 
+        raise NotImplementedError('%s: %s not supported' % (sys.argv[0], sys.platform))
+
  
     return (dll, plugin_path) 
  

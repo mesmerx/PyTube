@@ -14,7 +14,7 @@ class Player(QtGui.QMainWindow):
         self.setWindowTitle("Media Player")
 
         # creating a basic vlc instance
-        self.instance = vlc.Instance()
+        self.instance = vlc.Instance("--no-xlib")
         # creating an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer2 = self.instance.media_player_new()
@@ -186,7 +186,6 @@ class Player(QtGui.QMainWindow):
                 # "Pause", not the desired behavior of a media player
                 # this will fix it
                 self.Stop()
-
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     player = Player()
