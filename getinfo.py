@@ -5,7 +5,7 @@ import vlc
 import sys 
 import youtube_dl
 import json
-
+import urllib.request as urlb
 class getinfo():
     def __init__(self,url):
         self.str=""
@@ -29,23 +29,39 @@ class getinfo():
                  '50',
                  '48',
                  '24']
-        self.defq=['bestall',
-                   'midall',
-                   'lowall',
-                   'bestvidmidaud',
-                   'bestvidlowaudi',
-                   'bestaudmidvid',
-                   'bestaudlowvid',
-                   'midvidlowaud'
-                   'midauidlowvid']
+    def Response(self,link):
+        self.link=link
+        response = urlb.Request(link)
+        self.response=urlb.urlopen(response).readlines()
+        return self.response
 
-    def search2(self,sformat,ca=True,cv=True):
+    def FormatInfo(self):
+        if not self.response:
+            self.Response(self.link)
+        for a in self.response:
+            if'var ytplayer' in a.decode():
+                print(a)
+
+
+    def search2(self,sformat,cv=True,ca=True):
+        result={}
         for a in self.result['formats']:
-            if cv==True and ca==True:
-                if 'DASH' not in a['format'] and a['acodec']!='none':
-                    print('yes')
+            if sformat=='all':
+                if sformat in a['format']:
+                    result[a['format']]=a['url']
+            elif cv==True and ca==True:
+                if a['vcodec']!='none' and a['acodec']!='none':
                     if sformat in a['format']:
-                        print(a)
+                        result[a['format']]=a['url']
+            elif cv==False:
+                if a['vcodec']=='none':
+                        result['{} kbps'.format(a['abr'])]=a['url']
+            elif ca==False:
+                if a['acodec']=='none':
+                    if sformat in a['format']:
+                        result[a['format']]=a['url']
+
+        return result
     def infos(self):
         with youtube_dl.YoutubeDL() as ydl:
             self.result=ydl.extract_info(self.url, download=False)
@@ -57,7 +73,8 @@ class getinfo():
 
 
 yt=getinfo('fihQM_-9ueI')
-yt.search2('1080')
+yt.Response('https://www.youtube.com/watch?v=TPbs_Ztm16k')
+yt.FormatInfo()
 
 
 
